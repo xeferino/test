@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 use App\Producto;
 use App\Guia;
 
@@ -58,16 +59,15 @@ class GuiaController extends Controller
 
     public function last(Request $request)
     {
-        $guia =  Guia::latest('id')->first();
-        if($guia){
-            $numero = $guia->id+1;
-            $guia = str_pad($numero, 5, "P000", STR_PAD_LEFT);
-        }else{
-            $guia = "P0001";
-        }
+        $guia = DB::select("SELECT AUTO_INCREMENT As id
+                                FROM  INFORMATION_SCHEMA.TABLES
+                            WHERE TABLE_NAME = 'guias'");
+        $numero = $guia[0]->id;
+        $code = str_pad($numero, 5, "P000", STR_PAD_LEFT);
+
         return response()->json([
             'success' => true,
-            'guia' => $guia
+            'guia' =>  $code
         ]);
     }
 
